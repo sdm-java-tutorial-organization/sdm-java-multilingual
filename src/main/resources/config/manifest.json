@@ -1,17 +1,17 @@
 [
   {
-    "deployPath" : "http://s3.nexon.com/deploy/multilingual/got",
-    "excelName" : "got.xlsx",
-    "dirName" : "got",
+    "deployPath" : "http://s3.nexon.com/deploy/multilingual",
+    "excelName" : "multilingual.xlsx",
+    "dirName" : "dirA",
     "filePrefix": "message",
     "dilimeter": "_",
     "titles": ["en", "kr", "jp"],
     "type": "properties"
   },
   {
-    "deployPath" : "http://s3.nexon.com/deploy/multilingual/got2",
-    "excelName" : "got.xlsx",
-    "dirName" : "got2",
+    "deployPath" : "http://s3.nexon.com/deploy/multilingual",
+    "excelName" : "multilingual.xlsx",
+    "dirName" : "dirB",
     "filePrefix": "message",
     "dilimeter": "_",
     "titles": ["en", "kr", "jp"],
