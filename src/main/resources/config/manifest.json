@@ -1,0 +1,20 @@
+[
+  {
+    "deployPath" : "http://s3.nexon.com/deploy/multilingual/got",
+    "excelName" : "got.xlsx",
+    "dirName" : "got",
+    "filePrefix": "message",
+    "dilimeter": "_",
+    "titles": ["en", "kr", "jp"],
+    "type": "properties"
+  },
+  {
+    "deployPath" : "http://s3.nexon.com/deploy/multilingual/got2",
+    "excelName" : "got.xlsx",
+    "dirName" : "got2",
+    "filePrefix": "message",
+    "dilimeter": "_",
+    "titles": ["en", "kr", "jp"],
+    "type": "json"
+  }
+]
