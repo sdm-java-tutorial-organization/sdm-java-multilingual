@@ -8,9 +8,13 @@ import service.ExcelService;
 import service.ManifestService;
 import service.ProjectService;
 import util.ExcelUtil;
+import util.FileUtil;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -26,51 +30,68 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         logger.debug("process start...");
+
+        // ---------------------------------------------------------------
         ManifestService manifestService = ManifestService.getInstance();
         List<Config> manifest = manifestService.getManifest();
+        /*loadManifest(manifest);*/
+        // ---------------------------------------------------------------
 
+        // ---------------------------------------------------------------
+        // 잠깐테스트
+        makeExcelFromProperties(
+                "src/main/resources/sample",
+                "messages",
+                "_",
+                Arrays.asList("ko"),
+                FileUtil.FILE_FOAMAT_PROPERTIES);
+        // ---------------------------------------------------------------
+
+        logger.debug("process end...");
+    }
+
+    public static void loadManifest(List<Config> manifest) {
+        ExcelService excelService = ExcelService.getInstance();
         manifest.stream().forEach((config) -> {
             try {
-                manageExcel(config);
+                excelService.manageExcel(config);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-        logger.debug("process end...");
     }
 
-    /**
-     * manageExcel
-     *
-     * @param config - 구성파일
-     * */
-    public static void manageExcel(Config config) throws Exception, IOException {
-        ProjectService projectService = ProjectService.getInstance();
-        ExcelService excelService = ExcelService.getInstance();
-        Sheet sheet = excelService.getSheet(config.getExcelName());
+    public static void makeExcelFromProperties(String dirname,
+                                               String filename,
+                                               String dilimeter,
+                                               List<String> titles,
+                                               String filetype) throws IOException {
+        Map<String, Map<String, String>> result = new HashMap<>();
+        titles.stream().forEach((title) -> {
+            try {
+                String path = String.format("%s/%s%s%s.%s",
+                        dirname,
+                        filename,
+                        dilimeter,
+                        title,
+                        filetype);
+                File file = new File(path);
+                Properties properties = new Properties();
+                properties.load(new BufferedReader(new FileReader(file)));
+                Map<String, String> map = (Map) properties;
 
-        List<String> titles;
-        List<String> keys;
-        List<List<String>> arrOfValues;
+                map.entrySet().forEach((key) -> {
+                    System.out.println(key);
+                });
 
-        XSSFRow titleRow = ExcelUtil.getRow(sheet.getXssfSheet(), 0);
-        titles = excelService.getTitles(sheet, titleRow);
-        arrOfValues = excelService.getValues(sheet);
-        keys = arrOfValues.remove(0);
-
-        List<File> listOfFile = projectService.makePackage(config.getDirName(),
-                config.getFilePrefix(),
-                config.getDilimeter(),
-                config.getType(),
-                config.getTitles(),
-                titles);
-        if(config.getType().equals("json")) {
-            projectService.writePackageByJson(listOfFile, keys, arrOfValues);
-        } else {
-            projectService.writePackageByProperties(listOfFile, keys, arrOfValues);
-        }
+                /*System.out.println(strOfConfig);*/
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
+
 
 }

@@ -1,5 +1,6 @@
 package service;
 
+import model.Config;
 import model.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import util.ExcelUtil;
 import util.FileUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,5 +75,36 @@ public class ExcelService {
         return arrOfValues;
     }
 
+    /**
+     * manageExcel
+     *
+     * @param config - 구성파일
+     * */
+    public void manageExcel(Config config) throws Exception, IOException {
+        ProjectService projectService = ProjectService.getInstance();
+        ExcelService excelService = ExcelService.getInstance();
+        Sheet sheet = excelService.getSheet(config.getExcelName());
+
+        List<String> titles;
+        List<String> keys;
+        List<List<String>> arrOfValues;
+
+        XSSFRow titleRow = ExcelUtil.getRow(sheet.getXssfSheet(), 0);
+        titles = excelService.getTitles(sheet, titleRow);
+        arrOfValues = excelService.getValues(sheet);
+        keys = arrOfValues.remove(0);
+
+        List<File> listOfFile = projectService.makePackage(config.getDirName(),
+                config.getFilePrefix(),
+                config.getDilimeter(),
+                config.getType(),
+                config.getTitles(),
+                titles);
+        if(config.getType().equals("json")) {
+            projectService.writePackageByJson(listOfFile, keys, arrOfValues);
+        } else {
+            projectService.writePackageByProperties(listOfFile, keys, arrOfValues);
+        }
+    }
 
 }
