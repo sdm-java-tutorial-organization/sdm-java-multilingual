@@ -11,7 +11,7 @@
       "dir" : "projectA",
       "file" : "message",
       "dilimeter" : "_",
-      "titles" :  ["en", "kr", "jp"],
+      "titles" :  ["ko", "en", "jp"],
       "type": "properties"
     }
   }
