@@ -11,32 +11,30 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class Multilingual {
+public class Document {
 
     public static final int INIT_X = -1;
     public static final int INIT_Y = -1;
 
     int lengthX;
     int lengthY;
-    final int COUNT_OF_LANGUAGE;
     List<String> header;
     List<String> titles;
     Map<String, List<String>> body;
 
-    public Multilingual(int lengthX, int lengthY) {
-        this.lengthX = lengthX;
-        this.lengthY = lengthY;
-        this.COUNT_OF_LANGUAGE = lengthX - 1;
+    public Document() {
+
     }
 
-    public void setHeader(List<String> header) {
+    public Document(int lengthX, int lengthY) {
+        this.lengthX = lengthX;
+        this.lengthY = lengthY;
+    }
+
+    public void setHeaderAndTitles(List<String> header) {
         this.header = header;
         this.titles = new ArrayList<>(header);
         this.titles.remove(0);
-    }
-
-    private void setTitle() {
-        /*not used*/
     }
 
 }

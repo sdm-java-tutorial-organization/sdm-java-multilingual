@@ -1,7 +1,7 @@
 package service;
 
 import model.Config;
-import model.Multilingual;
+import model.Document;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import util.ExcelUtil;
 import util.FileUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -49,21 +48,16 @@ public class ExcelService {
         return titles;
     }
 
-    /**
-     * getMultilingual
-     *
-     * @param config - 구성파일
-     * */
-    public Multilingual getMultilingual(Config config) throws Exception, IOException {
+    public Document getMultilingual(Config config) throws Exception, IOException {
         XSSFSheet sheet = getSheet(config.getExcelName());
         int[] lengthXY = ExcelUtil.getLengthXY(sheet);
-        Multilingual multilingual = new Multilingual(lengthXY[0], lengthXY[1]);
+        Document multilingual = new Document(lengthXY[0], lengthXY[1]);
         List<String> header;
         Map<String, List<String>> body = new HashedMap<>();
 
         XSSFRow titleRow = ExcelUtil.getRow(sheet, 0);
         header = getListFromRow(titleRow, multilingual.getLengthX());
-        multilingual.setHeader(header);
+        multilingual.setHeaderAndTitles(header);
 
         for(int i=1; i<multilingual.getLengthY(); i++) {
             XSSFRow row = ExcelUtil.getRow(sheet, i);
@@ -72,6 +66,15 @@ public class ExcelService {
         }
         multilingual.setBody(body);
         return multilingual;
+    }
+
+    public void createExcelHeader(XSSFSheet sheet, List<String> header) {
+        XSSFRow row = ExcelUtil.initRow(sheet, ExcelUtil.FIRST_ROW);
+        ExcelUtil.initCells(row, header);
+    }
+
+    public void createExcelBody(XSSFSheet sheet) {
+
     }
 
 }

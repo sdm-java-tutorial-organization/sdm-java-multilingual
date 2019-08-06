@@ -54,26 +54,6 @@
 
 ## Manifest 작성방법
 
-- `deployPath`
-    - 배포되야하는 경로, 또는 방식
-- `excelName`
-    - target 폴더내에 excel 파일 이름
-    - 만약 target 폴더내에 excel 파일 이름이 없다면 `NotFoundExcelFileException` 반환
-- `dirName`
-    - deploy 폴더내에 배포 폴더 이름
-    - 만약 deploy 폴더이름이 중복될 경우 `DuplicateDirectoryException` 반환
-- `filePrefix`
-    - 배포파일의 접두어
-- `dilimeter`
-    - 배포파일의 구분자 (_ 권장)
-- `titles`
-    - 배포파일의 종류
-    - 만약 없을 경우 엑셀이 첫번째 행부분이 배포파일의 종류로 설정
-    - kr, en, jp, ...
-- `type`
-    - 배포파일 타입
-    - properties, json, ...
-
 ```json
 [
   {
@@ -87,6 +67,57 @@
   }
 ]
 ```
+
+- `deployPath`
+  - 배포되야하는 경로, 또는 방식
+- `excelName`
+  - target 폴더내에 excel 파일 이름
+  - 만약 target 폴더내에 excel 파일 이름이 없다면 `NotFoundExcelFileException` 반환
+- `dirName`
+  - deploy 폴더내에 배포 폴더 이름
+  - 만약 deploy 폴더이름이 중복될 경우 `DuplicateDirectoryException` 반환
+- `filePrefix`
+  - 배포파일의 접두어
+- `dilimeter`
+  - 배포파일의 구분자 ( _ 권장)
+- `titles`
+  - 배포파일의 종류
+  - 만약 없을 경우 엑셀이 첫번째 행부분이 배포파일의 종류로 설정
+  - kr, en, jp, ...
+- `type`
+  - 배포파일 타입
+  - properties, json, ...
+
+
+
+## Resource 파일
+
+> resource/target/
+
+빌드가 필요한 *.xlxs 파일을 저장하는 곳입니다.
+
+manifest.json 설정값에 따라 AWS S3 Storage에서 *.xlxs 파일을 가져올 수도 있습니다.
+
+
+
+> resource/deploy/
+
+빌드된 번역파일을 저장하는 곳입니다.
+
+manifest.json 설정값에 따라 AWS S3 Storage로 파일을 배포할 수도 있습니다.
+
+
+
+## API
+
+>  `Document`(Excel, CSV, ...) <-> `Resource`(Properties, Json, ...)
+
+- `Document`
+  - Excel과 같이 다국어를 작성하는 문서를 지칭하는 오브젝트
+- `Resource`
+  - Properties와 같이 빌드되어 다국어 자원으로 사용하는 오브젝트
+  - 리소스는 다양한 타입을 가질 수 있으나 기본 타입은 `Properties`로 합니다.
+    - Document -> Resource(\*.properties) -> Resource(\*.json)
 
 
 

@@ -1,7 +1,7 @@
 package service;
 
 import model.Config;
-import model.Multilingual;
+import model.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.FileUtil;
@@ -89,7 +89,8 @@ public class DeployService {
         }
     }
 
-    public void deploy(Config config, Multilingual multilingual) throws IOException {
+    public void deploy(Config config,
+                       Document multilingual) throws IOException {
         List<File> listOfFile = createDeployPackage(
                 config.getDirName(),
                 config.getFilePrefix(),
@@ -110,5 +111,9 @@ public class DeployService {
                         new ArrayList<>(multilingual.getBody().values()));
                 break;
         }
+    }
+
+    public void deployExcel(Config config) {
+
     }
 }

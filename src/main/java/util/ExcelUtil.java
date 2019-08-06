@@ -1,6 +1,6 @@
 package util;
 
-import model.Multilingual;
+import model.Document;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -8,9 +8,35 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class ExcelUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(ExcelUtil.class);
+
+    public static final int FIRST_ROW = 0;
+    public static final int FIRST_COLUMN = 0;
+
+    public static XSSFWorkbook initBook() {
+        return new XSSFWorkbook();
+    }
+
+    public static XSSFSheet initSheet(XSSFWorkbook book, String name) {
+        return book.createSheet(name);
+    }
+
+    public static XSSFRow initRow(XSSFSheet sheet, int index) {
+        return sheet.createRow(index);
+    }
+
+    public static void initCells(XSSFRow row, List<String> values) {
+        if(values != null && values.size()>1) {
+            for(int i=0; i<values.size(); i++) {
+                XSSFCell cell = row.createCell(i);
+                cell.setCellValue(values.get(i));
+            }
+        }
+    }
 
     public static XSSFSheet getSheet(XSSFWorkbook book, int index) {
         return book.getSheetAt(0);
@@ -59,10 +85,8 @@ public class ExcelUtil {
     }
 
     public static int[] getLengthXY(XSSFSheet sheet) throws Exception {
-        final int FIRST_ROW = 0;
-        final int FIRST_COLUMN = 0;
-        int resultX = Multilingual.INIT_X;
-        int resultY = Multilingual.INIT_Y;
+        int resultX = Document.INIT_X;
+        int resultY = Document.INIT_Y;
         int physicalRows = ExcelUtil.countRows(sheet);
         int pysicalColumns = ExcelUtil.countCells(sheet.getRow(0));
 
@@ -89,7 +113,7 @@ public class ExcelUtil {
 
                         // === X 측정 ===
                         if(row == FIRST_ROW) {
-                            if(resultX == Multilingual.INIT_X) {
+                            if(resultX == Document.INIT_X) {
                                 if (value.trim().equals("")) {
                                     resultX = column;
                                 }
@@ -107,10 +131,10 @@ public class ExcelUtil {
                 break;
             }
         }
-        if(resultX == Multilingual.INIT_X) {
+        if(resultX == Document.INIT_X) {
             resultX = pysicalColumns;
         }
-        if(resultY == Multilingual.INIT_Y) {
+        if(resultY == Document.INIT_Y) {
             resultY = physicalRows;
         }
 
@@ -121,7 +145,5 @@ public class ExcelUtil {
         
         return new int[] { resultX, resultY };
     }
-
-
 
 }

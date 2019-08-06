@@ -1,14 +1,15 @@
 
-import model.Config;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.ExcelService;
-import service.ManifestService;
+import service.PropertiesService;
+import util.ExcelUtil;
+import util.FileUtil;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 
@@ -27,19 +28,19 @@ public class Main {
         logger.debug("process start...");
 
         // ---------------------------------------------------------------
-        ManifestService manifestService = ManifestService.getInstance();
+        /*ManifestService manifestService = ManifestService.getInstance();
         List<Config> manifest = manifestService.getManifest();
-        manifestService.loadManifest(manifest);
+        manifestService.loadManifest(manifest);*/
         // ---------------------------------------------------------------
 
         // ---------------------------------------------------------------
         // 잠깐테스트
-        /*makeExcelFromProperties(
+        makeExcelFromProperties(
                 "src/main/resources/sample",
                 "messages",
                 "_",
-                Arrays.asList("ko"),
-                FileUtil.FILE_FOAMAT_PROPERTIES);*/
+                Arrays.asList("ko", "en", "in_ID", "ja", "th_TH", "vi_VN", "zh_CN", "zh_TW"),
+                FileUtil.FILE_FOAMAT_PROPERTIES);
         // ---------------------------------------------------------------
 
         logger.debug("process end...");
@@ -50,29 +51,51 @@ public class Main {
                                                String dilimeter,
                                                List<String> titles,
                                                String filetype) throws IOException {
-        Map<String, Map<String, String>> result = new HashMap<>();
-        titles.stream().forEach((title) -> {
-            try {
-                String path = String.format("%s/%s%s%s.%s",
-                        dirname,
-                        filename,
-                        dilimeter,
-                        title,
-                        filetype);
-                File file = new File(path);
-                Properties properties = new Properties();
-                properties.load(new BufferedReader(new FileReader(file)));
-                Map<String, String> map = (Map) properties;
+        PropertiesService propertiesService = PropertiesService.getInstance();
+        ExcelService excelService = ExcelService.getInstance();
 
-                map.entrySet().forEach((key) -> {
-                    System.out.println(key);
-                });
+        Map<String, List<String>> result = new HashMap<>();
+        for(int i=0; i<titles.size(); i++) {
+            // =====================================
+            String path = String.format("%s/%s%s%s.%s",
+                    dirname, filename, dilimeter, titles.get(i), filetype);
+            File file = new File(path);
+            // =====================================
+            Map<String, String> propertiesMap = propertiesService.getPropertiseMapFromFile(file);
+            // =====================================
+            propertiesService.accumulateExcel(result, propertiesMap, i);
+            // =====================================
+        }
 
-                /*System.out.println(strOfConfig);*/
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        // =====================================
+        XSSFWorkbook book = ExcelUtil.initBook();
+        XSSFSheet sheet = ExcelUtil.initSheet(book, "sheet");
+
+        excelService.createExcelHeader(sheet, null);
+
+        List<Map.Entry<String, List<String>>> entryList = new ArrayList<>(result.entrySet());
+        for(int i=0; i<entryList.size(); i++) {
+            Map.Entry<String, List<String>> entry = entryList.get(i);
+            XSSFRow row = ExcelUtil.initRow(sheet, i);
+            String key = entry.getKey();
+            LinkedList<String> value = (LinkedList<String>) entry.getValue();
+            value.addFirst(key);
+            /*List<String> cells = new ArrayList<>();
+            cells.add(key);
+            titles.stream().forEach(title -> {
+                cells.add(value.get(title) != null ? value.get(title) : "");
+            });*/
+            ExcelUtil.initCells(row, value);
+        }
+
+        // =====================================
+
+        // =====================================
+        FileOutputStream fileoutputstream = new FileOutputStream(
+                FileUtil.DEPLOY_LOCATION + "/이름.xlsx");
+        book.write(fileoutputstream);
+        fileoutputstream.close();
+        // =====================================
     }
 
 

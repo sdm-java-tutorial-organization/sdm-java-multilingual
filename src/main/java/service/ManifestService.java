@@ -1,7 +1,7 @@
 package service;
 
 import model.Config;
-import model.Multilingual;
+import model.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.FileUtil;
@@ -41,7 +41,7 @@ public class ManifestService {
     public void loadManifest(List<Config> manifest) {
         manifest.stream().forEach((config) -> {
             try {
-                Multilingual multilingual = excelService.getMultilingual(config);
+                Document multilingual = excelService.getMultilingual(config);
                 deployService.deploy(config, multilingual);
             } catch (IOException e) {
                 e.printStackTrace();
