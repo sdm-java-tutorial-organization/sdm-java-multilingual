@@ -23,7 +23,7 @@
 
 ## Excel 규칙
 
-![1565056364016](assets/1565056364016.png)
+![1565072057339](assets/1565072057339.png)
 
 >  정의
 
@@ -50,64 +50,6 @@
 
 
 
-
-
-## Manifest 작성방법
-
-```json
-[
-  {
-    "deployPath" : "deploy_path",
-    "excelName" : "excel.xlsx",
-    "dirName" : "mydir",
-    "filePrefix": "message",
-    "dilimeter": "_",
-    "titles": ["en", "kr", "jp"],
-    "type": "properties"
-  }
-]
-```
-
-- `deployPath`
-  - 배포되야하는 경로, 또는 방식
-- `excelName`
-  - target 폴더내에 excel 파일 이름
-  - 만약 target 폴더내에 excel 파일 이름이 없다면 `NotFoundExcelFileException` 반환
-- `dirName`
-  - deploy 폴더내에 배포 폴더 이름
-  - 만약 deploy 폴더이름이 중복될 경우 `DuplicateDirectoryException` 반환
-- `filePrefix`
-  - 배포파일의 접두어
-- `dilimeter`
-  - 배포파일의 구분자 ( _ 권장)
-- `titles`
-  - 배포파일의 종류
-  - 만약 없을 경우 엑셀이 첫번째 행부분이 배포파일의 종류로 설정
-  - kr, en, jp, ...
-- `type`
-  - 배포파일 타입
-  - properties, json, ...
-
-
-
-## Resource 파일
-
-> resource/target/
-
-빌드가 필요한 *.xlxs 파일을 저장하는 곳입니다.
-
-manifest.json 설정값에 따라 AWS S3 Storage에서 *.xlxs 파일을 가져올 수도 있습니다.
-
-
-
-> resource/deploy/
-
-빌드된 번역파일을 저장하는 곳입니다.
-
-manifest.json 설정값에 따라 AWS S3 Storage로 파일을 배포할 수도 있습니다.
-
-
-
 ## API
 
 >  `Document`(Excel, CSV, ...) <-> `Resource`(Properties, Json, ...)
@@ -118,6 +60,107 @@ manifest.json 설정값에 따라 AWS S3 Storage로 파일을 배포할 수도 �
   - Properties와 같이 빌드되어 다국어 자원으로 사용하는 오브젝트
   - 리소스는 다양한 타입을 가질 수 있으나 기본 타입은 `Properties`로 합니다.
     - Document -> Resource(\*.properties) -> Resource(\*.json)
+
+
+
+
+
+## Manifest 작성방법
+
+Manifest 파일은 구성요소를 미리 정의해두는 파일입니다.
+
+파일위치는 
+
+json 형식을 지원합니다.
+
+
+
+> [manifest] Document -> Resource & Resource -> Document 모두 가능합니다.
+
+```json
+[
+  {
+    "importPath" : "src/main/resources/target",
+    "exportPath" : "http://s3.nexon.com/deploy",
+    "document" : {
+      "dir" : "",
+      "file" : "excelfile.xlsx",
+      "type" : "excel"
+    },
+    "resource" : {
+      "dir" : "projectA",
+      "file" : "message",
+      "dilimeter" : "_",
+      "titles" :  ["en", "kr", "jp"],
+      "type": "properties"
+    }
+  }
+]
+```
+
+- `importPath`
+  - target directory 빌드 대상 자원인 있는 경로
+- `exportPath`
+  - deploy directory 빌드 완료 자원이 배포되는 경로
+- `document`
+  - `dir`
+    - Document dir 내에 폴더 이름
+    - 만약 deploy 시에 폴더 이름이 중복될 경우 `DuplicateDirectoryException` 반환
+  - `file`
+    - Document dir 내에 파일 이름
+    - 만약 Document 폴더 내에 파일이 없다면 `NotFoundFileException` 반환
+  - `type`
+    - Document 파일 타입
+    - excel, csv, ...
+- `resource`
+  - `dir`	
+    - Resource dir 내에 폴더 이름
+    - 만약 deploy 시에 폴더 이름이 중복될 경우 `DuplicateDirectoryException` 반환
+  - `file`
+    - Resource 파일 이름의 접두어
+    - 만약 Resource 폴더 내에 파일이 없다면 `NotFoundFileException반환
+  - `dilimeter`
+    - Resource 파일의 구분자 ( _ 권장)
+  - `titles`
+    - Resource 파일의 종류
+    - 만약 없을 경우 엑셀이 첫번째 행부분이 배포파일의 종류로 설정
+    - kr, en, jp, ...
+  - `type`
+    - Resource 파일 타입
+    - properties, json, ...
+
+
+
+## JSON 타입 이슈
+
+현재까지 확인한 바로는 `*.properties`  파일을 완벽히 `*.json`으로 표현할 수 있는 것은 아닙니다.
+
+아래의 예제를 확인해 봅시다.
+
+> .properties 파일
+
+```properties
+marvel=마블
+marvel.tony=아이언맨
+marvel.logers=캡틴아메리카
+```
+
+> .json 파일
+
+```json
+{
+	marvel : {
+		tony : "아이언맨",
+        logers : "캡틴아메리카"
+	}
+}
+```
+
+`.properties` 파일은 하위그룹을 묶어주는 상위그룹에 값을 지정할 수 있으나
+
+`.json` 파일은 하위그룹이 있다면 객체로 표현되기 때문에 상위 그룹에 값을 지정할 수 없습니다.
+
+> 따라서 .properties -> .json으로 호환하는 방식은 완전하지 않습니다.
 
 
 

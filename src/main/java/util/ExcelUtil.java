@@ -8,6 +8,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExcelUtil {
@@ -36,6 +38,10 @@ public class ExcelUtil {
                 cell.setCellValue(values.get(i));
             }
         }
+    }
+
+    public static XSSFWorkbook getBook(String dirName, String excelName) throws IOException {
+        return FileUtil.getExcelBook(String.format("%s/%s", dirName, excelName));
     }
 
     public static XSSFSheet getSheet(XSSFWorkbook book, int index) {
@@ -144,6 +150,18 @@ public class ExcelUtil {
             throw new Exception();
         
         return new int[] { resultX, resultY };
+    }
+
+    public static List<String> getListByRow(XSSFRow row, int size) {
+        List<String> result = new ArrayList<>();
+        for (int cIdx = 0; cIdx < size; cIdx++) {
+            XSSFCell cell = ExcelUtil.getCell(row, cIdx);
+            if(cell != null) {
+                String value = ExcelUtil.getCellValue(cell);
+                result.add(value);
+            }
+        }
+        return result;
     }
 
 }

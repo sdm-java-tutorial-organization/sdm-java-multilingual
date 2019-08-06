@@ -1,14 +1,13 @@
 [
   {
-    "importPath" : "src/main/resources/target",
+    "importPath" : "http://s3.nexon.com/target",
     "exportPath" : "http://s3.nexon.com/deploy",
     "document" : {
       "dir" : "",
-      "file" : "excelfile.xlsx",
+      "file" : "excelfile",
       "type" : "excel"
     },
     "resource" : {
-      "dir" : "projectA",
       "file" : "message",
       "dilimeter" : "_",
       "titles" :  ["en", "kr", "jp"],

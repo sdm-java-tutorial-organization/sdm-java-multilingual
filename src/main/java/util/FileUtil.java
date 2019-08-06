@@ -15,9 +15,9 @@ public class FileUtil {
     public static final String DEPLOY_LOCATION = "src/main/resources/deploy";
     public static final String TARGET_LOCATION = "src/main/resources/target";
     public static final String CONFIG_LOCATION = "src/main/resources/config";
-    public static final String FILE_MANIFEST = "manifest";
     public static final String FILE_FOAMAT_PROPERTIES = "properties";
     public static final String FILE_FOAMAT_JSON = "json";
+    public static final String FILE_FOAMAT_EXCEL = "xlsx";
 
     /**
      * getExcelBook

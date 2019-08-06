@@ -7,12 +7,14 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import util.ExcelUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Data
 public class Document {
 
+    public static final String FIRST_CELL = "ID";
     public static final int INIT_X = -1;
     public static final int INIT_Y = -1;
 
@@ -23,18 +25,15 @@ public class Document {
     Map<String, List<String>> body;
 
     public Document() {
-
+        this.header = new ArrayList<>();
+        this.body = new HashMap<>();
     }
 
     public Document(int lengthX, int lengthY) {
         this.lengthX = lengthX;
         this.lengthY = lengthY;
-    }
-
-    public void setHeaderAndTitles(List<String> header) {
-        this.header = header;
-        this.titles = new ArrayList<>(header);
-        this.titles.remove(0);
+        this.header = new ArrayList<>();
+        this.body = new HashMap<>();
     }
 
 }
