@@ -63,7 +63,6 @@ public class ExcelService {
 
         XSSFRow titleRow = ExcelUtil.getRow(sheet, 0);
         header = getListFromRow(titleRow, multilingual.getLengthX());
-        header.remove(0);
         multilingual.setHeader(header);
 
         for(int i=1; i<multilingual.getLengthY(); i++) {

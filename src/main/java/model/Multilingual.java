@@ -20,12 +20,23 @@ public class Multilingual {
     int lengthY;
     final int COUNT_OF_LANGUAGE;
     List<String> header;
+    List<String> titles;
     Map<String, List<String>> body;
 
     public Multilingual(int lengthX, int lengthY) {
         this.lengthX = lengthX;
         this.lengthY = lengthY;
         this.COUNT_OF_LANGUAGE = lengthX - 1;
+    }
+
+    public void setHeader(List<String> header) {
+        this.header = header;
+        this.titles = new ArrayList<>(header);
+        this.titles.remove(0);
+    }
+
+    private void setTitle() {
+        /*not used*/
     }
 
 }

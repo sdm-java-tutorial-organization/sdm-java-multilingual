@@ -59,6 +59,8 @@ public class ExcelUtil {
     }
 
     public static int[] getLengthXY(XSSFSheet sheet) throws Exception {
+        final int FIRST_ROW = 0;
+        final int FIRST_COLUMN = 0;
         int resultX = Multilingual.INIT_X;
         int resultY = Multilingual.INIT_Y;
         int physicalRows = ExcelUtil.countRows(sheet);
@@ -67,35 +69,42 @@ public class ExcelUtil {
         logger.debug(
                 String.format("(physicalX, physicalY) = (%d, %d)", pysicalColumns, physicalRows));
 
-        for (int rIdx = 0; rIdx < physicalRows; rIdx++) {
-            XSSFRow row = ExcelUtil.getRow(sheet, rIdx);
-            if (row != null) {
-                for (int cIdx = 0; cIdx < pysicalColumns; cIdx++) {
-                    XSSFCell cell = ExcelUtil.getCell(row, cIdx);
+        for (int row = 0; row < physicalRows; row++) {
+            XSSFRow line = ExcelUtil.getRow(sheet, row);
+            if (line != null) {
+                for (int column = 0; column < pysicalColumns; column++) {
+                    XSSFCell cell = ExcelUtil.getCell(line, column);
                     if (cell != null) {
                         String value = ExcelUtil.getCellValue(cell);
                         // === Y 측정 ===
-                        if(cIdx == 0) {
+                        if(column == FIRST_COLUMN) {
                             if (value.trim().equals("")) {
-                                resultY = rIdx;
+                                resultY = row;
                             }
                         } else {
-                            if(resultX != Multilingual.INIT_X) {
+                            if(row != FIRST_ROW) {
                                 break;
                             }
                         }
+
                         // === X 측정 ===
-                        if(resultX == Multilingual.INIT_X) {
-                            if (value.trim().equals("")) {
-                                resultX = cIdx;
+                        if(row == FIRST_ROW) {
+                            if(resultX == Multilingual.INIT_X) {
+                                if (value.trim().equals("")) {
+                                    resultX = column;
+                                }
                             }
                         }
                     } else {
-                        /*logger.debug("cell null");*/
+                        logger.debug("cell null : column " + column);
+                        resultX = column;
+                        break;
                     }
                 }
             } else {
-                /*logger.debug("row null");*/
+                logger.debug("row null : row " + row);
+                resultY = row;
+                break;
             }
         }
         if(resultX == Multilingual.INIT_X) {

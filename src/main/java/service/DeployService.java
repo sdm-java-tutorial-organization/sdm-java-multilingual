@@ -96,7 +96,7 @@ public class DeployService {
                 config.getDilimeter(),
                 config.getType(),
                 config.getTitles(),
-                multilingual.getHeader());
+                multilingual.getTitles());
 
         switch (config.getType()) {
             case FileUtil.FILE_FOAMAT_JSON:
