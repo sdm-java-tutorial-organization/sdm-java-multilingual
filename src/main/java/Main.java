@@ -1,14 +1,9 @@
 
 import model.Config;
-import model.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.ExcelService;
 import service.ManifestService;
-import service.ProjectService;
-import util.ExcelUtil;
-import util.FileUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,33 +29,20 @@ public class Main {
         // ---------------------------------------------------------------
         ManifestService manifestService = ManifestService.getInstance();
         List<Config> manifest = manifestService.getManifest();
-        /*loadManifest(manifest);*/
+        manifestService.loadManifest(manifest);
         // ---------------------------------------------------------------
 
         // ---------------------------------------------------------------
         // 잠깐테스트
-        makeExcelFromProperties(
+        /*makeExcelFromProperties(
                 "src/main/resources/sample",
                 "messages",
                 "_",
                 Arrays.asList("ko"),
-                FileUtil.FILE_FOAMAT_PROPERTIES);
+                FileUtil.FILE_FOAMAT_PROPERTIES);*/
         // ---------------------------------------------------------------
 
         logger.debug("process end...");
-    }
-
-    public static void loadManifest(List<Config> manifest) {
-        ExcelService excelService = ExcelService.getInstance();
-        manifest.stream().forEach((config) -> {
-            try {
-                excelService.manageExcel(config);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
     }
 
     public static void makeExcelFromProperties(String dirname,

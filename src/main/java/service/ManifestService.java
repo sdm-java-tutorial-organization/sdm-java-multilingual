@@ -1,12 +1,14 @@
 package service;
 
 import model.Config;
+import model.Multilingual;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.FileUtil;
 import util.JsonUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class ManifestService {
@@ -14,6 +16,9 @@ public class ManifestService {
     private static final Logger logger = LoggerFactory.getLogger(ManifestService.class);
 
     private static ManifestService instance = new ManifestService();
+
+    ExcelService excelService = ExcelService.getInstance();
+    DeployService deployService = DeployService.getInstance();
 
     private ManifestService() {
         logger.debug("create ManifestService");
@@ -31,6 +36,19 @@ public class ManifestService {
                 FileUtil.FILE_FOAMAT_JSON));
         String strOfConfig = FileUtil.readFile(manifest);
         return JsonUtil.getArrConfig(strOfConfig);
+    }
+
+    public void loadManifest(List<Config> manifest) {
+        manifest.stream().forEach((config) -> {
+            try {
+                Multilingual multilingual = excelService.getMultilingual(config);
+                deployService.deploy(config, multilingual);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
 }

@@ -1,7 +1,8 @@
 package service;
 
 import model.Config;
-import model.Sheet;
+import model.Multilingual;
+import org.apache.commons.collections4.map.HashedMap;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -13,14 +14,14 @@ import util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ExcelService {
 
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
-
     private static ExcelService instance = new ExcelService();
+
+    DeployService deployService = DeployService.getInstance();
 
     private ExcelService() {
         logger.debug("create ExcelService");
@@ -30,17 +31,15 @@ public class ExcelService {
         return instance;
     }
 
-    public Sheet getSheet(String excelName) throws Exception, IOException {
+    public XSSFSheet getSheet(String excelName) throws Exception, IOException {
         XSSFWorkbook book = FileUtil.getExcelBook(String.format("%s/%s", FileUtil.TARGET_LOCATION, excelName));
         XSSFSheet xssfSheet = ExcelUtil.getSheet(book, 0);
-        Sheet sheet = new Sheet(xssfSheet);
-        ExcelUtil.setEntryXY(sheet);
-        return sheet;
+        return xssfSheet;
     }
 
-    public List<String> getTitles(Sheet sheet, XSSFRow row) {
-        List<String> titles = new ArrayList<String>();
-        for (int cIdx = 1; cIdx < sheet.getLengthX(); cIdx++) {
+    public List<String> getListFromRow(XSSFRow row, int size) {
+        List<String> titles = new ArrayList<>();
+        for (int cIdx = 0; cIdx < size; cIdx++) {
             XSSFCell cell = ExcelUtil.getCell(row, cIdx);
             if(cell != null) {
                 String value = ExcelUtil.getCellValue(cell);
@@ -50,61 +49,30 @@ public class ExcelService {
         return titles;
     }
 
-    public List<List<String>> getValues(Sheet sheet) {
-        List<List<String>> arrOfValues = getEmptyValues(sheet.getLengthX());
-        for (int rIdx = 1; rIdx < sheet.getLengthY(); rIdx++) {
-            XSSFRow row = ExcelUtil.getRow(sheet.getXssfSheet(), rIdx);
-            if(row != null) {
-                for (int cIdx = 0; cIdx < sheet.getLengthX(); cIdx++) {
-                    XSSFCell cell = ExcelUtil.getCell(row, cIdx);
-                    if(cell != null) {
-                        String value = ExcelUtil.getCellValue(cell);
-                        arrOfValues.get(cIdx).add(value);
-                    }
-                }
-            }
-        }
-        return arrOfValues;
-    }
-
-    public List<List<String>> getEmptyValues(int size) {
-        List<List<String>> arrOfValues = new ArrayList<>();
-        for(int i=0; i<size; i++) {
-            arrOfValues.add(new ArrayList<>());
-        }
-        return arrOfValues;
-    }
-
     /**
-     * manageExcel
+     * getMultilingual
      *
      * @param config - 구성파일
      * */
-    public void manageExcel(Config config) throws Exception, IOException {
-        ProjectService projectService = ProjectService.getInstance();
-        ExcelService excelService = ExcelService.getInstance();
-        Sheet sheet = excelService.getSheet(config.getExcelName());
+    public Multilingual getMultilingual(Config config) throws Exception, IOException {
+        XSSFSheet sheet = getSheet(config.getExcelName());
+        int[] lengthXY = ExcelUtil.getLengthXY(sheet);
+        Multilingual multilingual = new Multilingual(lengthXY[0], lengthXY[1]);
+        List<String> header;
+        Map<String, List<String>> body = new HashedMap<>();
 
-        List<String> titles;
-        List<String> keys;
-        List<List<String>> arrOfValues;
+        XSSFRow titleRow = ExcelUtil.getRow(sheet, 0);
+        header = getListFromRow(titleRow, multilingual.getLengthX());
+        header.remove(0);
+        multilingual.setHeader(header);
 
-        XSSFRow titleRow = ExcelUtil.getRow(sheet.getXssfSheet(), 0);
-        titles = excelService.getTitles(sheet, titleRow);
-        arrOfValues = excelService.getValues(sheet);
-        keys = arrOfValues.remove(0);
-
-        List<File> listOfFile = projectService.makePackage(config.getDirName(),
-                config.getFilePrefix(),
-                config.getDilimeter(),
-                config.getType(),
-                config.getTitles(),
-                titles);
-        if(config.getType().equals("json")) {
-            projectService.writePackageByJson(listOfFile, keys, arrOfValues);
-        } else {
-            projectService.writePackageByProperties(listOfFile, keys, arrOfValues);
+        for(int i=1; i<multilingual.getLengthY(); i++) {
+            XSSFRow row = ExcelUtil.getRow(sheet, i);
+            List<String> listFromRow = getListFromRow(row, multilingual.getLengthX());
+            body.put(listFromRow.remove(0), listFromRow);
         }
+        multilingual.setBody(body);
+        return multilingual;
     }
 
 }

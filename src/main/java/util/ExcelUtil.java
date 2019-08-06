@@ -1,19 +1,12 @@
 package util;
 
-import model.Config;
-import model.Sheet;
+import model.Multilingual;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import service.ExcelService;
-import service.ProjectService;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 public class ExcelUtil {
 
@@ -65,15 +58,17 @@ public class ExcelUtil {
         return result;
     }
 
-    public static void setEntryXY(Sheet sheet) throws Exception {
-        int physicalRows = ExcelUtil.countRows(sheet.getXssfSheet());
-        int pysicalColumns = ExcelUtil.countCells(sheet.getXssfSheet().getRow(0));
+    public static int[] getLengthXY(XSSFSheet sheet) throws Exception {
+        int resultX = Multilingual.INIT_X;
+        int resultY = Multilingual.INIT_Y;
+        int physicalRows = ExcelUtil.countRows(sheet);
+        int pysicalColumns = ExcelUtil.countCells(sheet.getRow(0));
 
         logger.debug(
                 String.format("(physicalX, physicalY) = (%d, %d)", pysicalColumns, physicalRows));
 
         for (int rIdx = 0; rIdx < physicalRows; rIdx++) {
-            XSSFRow row = ExcelUtil.getRow(sheet.getXssfSheet(), rIdx);
+            XSSFRow row = ExcelUtil.getRow(sheet, rIdx);
             if (row != null) {
                 for (int cIdx = 0; cIdx < pysicalColumns; cIdx++) {
                     XSSFCell cell = ExcelUtil.getCell(row, cIdx);
@@ -82,17 +77,17 @@ public class ExcelUtil {
                         // === Y 측정 ===
                         if(cIdx == 0) {
                             if (value.trim().equals("")) {
-                                sheet.setLengthY(rIdx);
+                                resultY = rIdx;
                             }
                         } else {
-                            if(sheet.getLengthX() != Sheet.INIT_X) {
+                            if(resultX != Multilingual.INIT_X) {
                                 break;
                             }
                         }
                         // === X 측정 ===
-                        if(sheet.getLengthX() == Sheet.INIT_X) {
+                        if(resultX == Multilingual.INIT_X) {
                             if (value.trim().equals("")) {
-                                sheet.setLengthX(cIdx);
+                                resultX = cIdx;
                             }
                         }
                     } else {
@@ -103,17 +98,19 @@ public class ExcelUtil {
                 /*logger.debug("row null");*/
             }
         }
-        if(sheet.getLengthX() == Sheet.INIT_X) {
-            sheet.setLengthX(pysicalColumns);
+        if(resultX == Multilingual.INIT_X) {
+            resultX = pysicalColumns;
         }
-        if(sheet.getLengthY() == Sheet.INIT_Y) {
-            sheet.setLengthY(physicalRows);
+        if(resultY == Multilingual.INIT_Y) {
+            resultY = physicalRows;
         }
 
-        logger.debug(String.format("(entryX, entryY) = (%d, %d)", sheet.getLengthX(), sheet.getLengthY()));
+        logger.debug(String.format("(entryX, entryY) = (%d, %d)", resultX, resultY));
 
-        if(sheet.getLengthX() < 2 || sheet.getLengthY() <2)
+        if(resultX < 2 || resultY <2)
             throw new Exception();
+        
+        return new int[] { resultX, resultY };
     }
 
 
