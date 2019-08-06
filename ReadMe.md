@@ -50,7 +50,7 @@
 
 
 
-## API
+## Object 구성
 
 >  `Document`(Excel, CSV, ...) <-> `Resource`(Properties, Json, ...)
 
@@ -149,9 +149,9 @@ marvel.logers=캡틴아메리카
 
 ```json
 {
-	marvel : {
-		tony : "아이언맨",
-        logers : "캡틴아메리카"
+	"marvel" : {
+        "tony" : "아이언맨",
+        "logers" : "캡틴아메리카"
 	}
 }
 ```
@@ -161,6 +161,14 @@ marvel.logers=캡틴아메리카
 `.json` 파일은 하위그룹이 있다면 객체로 표현되기 때문에 상위 그룹에 값을 지정할 수 없습니다.
 
 > 따라서 .properties -> .json으로 호환하는 방식은 완전하지 않습니다.
+
+
+
+## 결과
+
+프로젝트 빌드후에 확인한 결과값입니다.
+
+![1565074410239](assets/1565074410239.png)
 
 
 
