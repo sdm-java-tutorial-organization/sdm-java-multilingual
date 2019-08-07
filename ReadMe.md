@@ -69,13 +69,13 @@
 
 Manifest 파일은 구성요소를 미리 정의해두는 파일입니다.
 
-파일위치는 
+파일위치는 파일시스템을 통해 내부 자원을 사용할 수도 HTTP를 통해 외부 자원을 사용할 수도 있습니다.
 
-json 형식을 지원합니다.
+파일은 JSON 형식을 지원합니다.
 
 
 
-> [manifest] Document -> Resource & Resource -> Document 모두 가능합니다.
+> [manifest] Document -> Resource && Resource -> Document 모두 가능합니다.
 
 ```json
 [
@@ -100,8 +100,10 @@ json 형식을 지원합니다.
 
 - `importPath`
   - target directory 빌드 대상 자원인 있는 경로
+  - 파일시스템으로 내부 자원을 가져올 수도 HTTP를 통한 외부 자원을 가져올 수도 있습니다.
 - `exportPath`
   - deploy directory 빌드 완료 자원이 배포되는 경로
+  - 파일시스템으로 내부 자원을 가져올 수도 HTTP를 통한 외부 자원을 가져올 수도 있습니다.
 - `document`
   - `dir`
     - Document dir 내에 폴더 이름
@@ -174,6 +176,7 @@ marvel.logers=캡틴아메리카
 
 ## TODO
 
+- 정렬작업추가 ( sort option - acs / desc )
 - AWS Lambda 프로세스 연동
 - AWS S3 Storage 연동
 - 알림프로세스 - 빌드동작여부를 Developer에게 전달 ( slack, mail, ... )
